@@ -1,6 +1,7 @@
 const config = require('./ultils/config')
 const express = require('express')
 const app = express()
+require("express-async-errors")
 const cors = require('cors')
 const blogsRouter = require('./controllers/blogs')
 const middleware = require('./ultils/middleware')
@@ -19,7 +20,7 @@ mongoose.connect(config.MONGODB_URI)
 		logger.error('error connecting to MongoDB:',error.message)
 	})
 
-app.use(cors)
+app.use(cors())
 app.use(express.static('build'))	 //make make it possible to access files from this folder via HTTP.
 app.use(express.json())
 app.use(middleware.requestLogger)
