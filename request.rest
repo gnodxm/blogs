@@ -11,9 +11,9 @@ POST http://localhost:3003/api/users
 Content-Type: application/json
 
 {
-	"username": "teemo",
-	"name": "Teesmo",
-	"password": "captainTeemo"
+	"username": "katarina",
+	"name": "Katarina",
+	"password": "12345"
 }
 
 ###
@@ -28,11 +28,15 @@ Content-Type: application/json
 ###
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlZW1vIiwiaWQiOiI2NDg2N2IxNGU5ZjY3MjY3NTk4N2UzYmQiLCJpYXQiOjE2ODY1NTE2MTIsImV4cCI6MTY4NjU1NTIxMn0.CwgCJ02OO_UF1-mzux7rZiPtZSQ4jHEL04hw76Aod6k
 
 {
-		"title": "React patterns",
-		"author": "Michael Chan",
-		"url": "https://reactpatterns.com/",
-		"likes": 7,
-	},
+	"title": "test1",
+	"url": "https://reactpatterns.com/",
+	"likes": 7
+}
+
+###
+DELETE http://localhost:3003/api/blogs/6486bc47646487b03e2af9ce
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlZW1vIiwiaWQiOiI2NDg2N2IxNGU5ZjY3MjY3NTk4N2UzYmQiLCJpYXQiOjE2ODY1NTA0NjksImV4cCI6MTY4NjU1NDA2OX0.lffqtXvENAF8vMpgr0c-nvR5bp_oGfAVdAPYTuWmNmU

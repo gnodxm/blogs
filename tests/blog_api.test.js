@@ -26,7 +26,7 @@ describe('when a blog is posted', () => {
 		expect(ids).toBeDefined()
 	})
 	
-	test('HTTP POST to create a new blog post', async () => {
+	test.only('HTTP POST to create a new blog post', async () => {
 		const newBlog = {
 			title: 'Serverless NodeJS: Everything to Know About',
 			author: 'Divyesh Maheta',
@@ -34,6 +34,7 @@ describe('when a blog is posted', () => {
 			likes: 10
 		}
 		await api.post('/api/blogs')
+			.set('Authorization', 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlZW1vIiwiaWQiOiI2NDg2N2IxNGU5ZjY3MjY3NTk4N2UzYmQiLCJpYXQiOjE2ODY1NTE2MTIsImV4cCI6MTY4NjU1NTIxMn0.CwgCJ02OO_UF1-mzux7rZiPtZSQ4jHEL04hw76Aod6k')
 			.send(newBlog)
 			.expect(201)
 			.expect('Content-Type', /application\/json/)
@@ -87,7 +88,7 @@ describe('deletion of a blog', () => {
 	})
 })
 
-describe.only('When update information of a blog', () => {
+describe('When update information of a blog', () => {
 	test('successfully update blog likes', async() => {
 		const blogsAtStart = await helper.blogsInDb()
 		const blogToUpdate = blogsAtStart[0] 

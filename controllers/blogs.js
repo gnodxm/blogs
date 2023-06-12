@@ -2,58 +2,61 @@ const blogsRouter = require('express').Router()
 const Blog = require('../models/blog')
 const jwt = require('jsonwebtoken')
 const User = require('../models/user')
+const userExtractor = require('../ultils/middleware').userExtractor
 
-const getTokenFrom = req => {
-	const authorization = req.get('authorization')
-	if (authorization && authorization.statsWith('Bearer ')) {
-		return authorization.replace('Bearer ','')
-	}
-	return null
-}
 
-blogsRouter.get('/', async (req,res) => {
+blogsRouter.get('/', async (req,response) => {
   const blogs = await Blog.find({})
-    res.json(blogs)
+		.populate('user',{username: 1, name: 1,  id: 1 })
+	response.json(blogs)
 })
 
-blogsRouter.get('/:id', (req, res,  next) => {
+blogsRouter.get('/:id', (req, response,  next) => {
   Blog.findById(req.params.id)
     .then(blog => {
       if (blog) {
-        res.json(blog)
+        response.json(blog)
       }  else {
-        res.status(404).end()
+        response.status(404).end()
       }
     })
     .catch(error => next(error))
 })
 
-blogsRouter.post('/', async (req, res) => {
+blogsRouter.post('/',userExtractor, async (req, response) => {
 	const body = req.body
 
-	const decodedToken = jwt.verify(getTokenFrom(req), process.env.SECRET)
+	const decodedToken = jwt.verify(req.token, process.env.SECRET)
 	if(!decodedToken.id) {
-		res.status(401).json({error: 'token invalid'})
+		return response.status(401).json({error: 'token invalid'})
 	}
 
-	const user = await User.findById(decodedToken.id)
+	
 
 	const blog = new Blog({
 		title: body.title,
-		author: body.author,
+		author: req.user.username,
 		url: body.url,
 		likes: body.likes||0,
-		user: user._id
+		user: req.user._id
 	})
+	console.log(req.user);
 
 	const savedBlog = await blog.save()
-	user.blogs = user.blogs.concat(savedBlog)
-	await user.save()
+	req.user.blogs = req.user.blogs.concat(savedBlog)
+	await req.user.save()
 
-	res.status(201).json(savedBlog)
+	response.status(201).json(savedBlog)
 })
 
 blogsRouter.delete('/:id', async (req, res) => {
+	const blogToDelete = await Blog.findById(req.params.id)
+	if (!blogToDelete) {
+		return res.status(400).json({error: 'Not found'})
+	} else	if (!(req.user.id && req.user.id  ===  blogToDelete.user.toString()))  {
+		return res.status(401).json({error: 'Not authorized'})
+	}
+
 	await Blog.findByIdAndRemove(req.params.id)
 	res.status(204).end()
 })
