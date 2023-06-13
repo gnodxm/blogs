@@ -35,25 +35,33 @@ blogsRouter.post('/',userExtractor, async (req, response) => {
 
 	const blog = new Blog({
 		title: body.title,
-		author: req.user.username,
+		author: req.author,
 		url: body.url,
 		likes: body.likes||0,
 		user: req.user._id
 	})
-	console.log(req.user);
+
 
 	const savedBlog = await blog.save()
 	req.user.blogs = req.user.blogs.concat(savedBlog)
 	await req.user.save()
 
-	response.status(201).json(savedBlog)
+	const returnBlog = await savedBlog.populate('user',{username: 1, name: 1,  id: 1 })
+	response.status(201).json(returnBlog)
 })
 
-blogsRouter.delete('/:id', async (req, res) => {
+blogsRouter.delete('/:id',userExtractor, async (req, res) => {
 	const blogToDelete = await Blog.findById(req.params.id)
+	
+	const decodedToken = jwt.verify(req.token, process.env.SECRET)
+	if(!decodedToken.id) {
+		return response.status(401).json({error: 'token invalid'})
+	}
+
+	console.log(req.user)
 	if (!blogToDelete) {
 		return res.status(400).json({error: 'Not found'})
-	} else	if (!(req.user.id && req.user.id  ===  blogToDelete.user.toString()))  {
+	} else	if (!(decodedToken.id  ===  blogToDelete.user.toString()))  {
 		return res.status(401).json({error: 'Not authorized'})
 	}
 
